@@ -1,0 +1,25 @@
+{
+  "name": "freshdetect",
+  "version": "1.0.0",
+  "description": "Full Stack Web App for IoT based Smart Shipping Container to control food supply by tackling supply chain inefficiencies.",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/QasimWani/FreshDetect-2.0.git"
+  },
+  "keywords": [
+    "FreshDetect",
+    "Save_the_world",
+    "BCI"
+  ],
+  "author": "Qasim Wani",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/QasimWani/FreshDetect-2.0/issues"
+  },
+  "homepage": "https://github.com/QasimWani/FreshDetect-2.0#readme"
+}
