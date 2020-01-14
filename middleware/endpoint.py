@@ -1,7 +1,4 @@
-from watson_developer_cloud import VisualRecognitionV3
-import json
-import numpy as np
-
+import sys
 ### This program predicts how fresh a produce is based on it's Temperature, Humidity, and VOC readongs. It also takes an image to detect other
 ### metrics such as appearence and Fe2O3 presense based on appearence.
 
@@ -34,8 +31,13 @@ def calculate_freshness_score(ripe_score, green_score, overripe_score, temp_scr,
     else:
         return base_freshness
 
-    print(base_freshness)
+    
+def main(argv):
+    freshness_score = calculate_freshness_score(argv[0],argv[1],argv[2],argv[3],argv[4],argv[5])
+    print(freshness_score)
 
+if __name__ == "__main__":
+    main(sys.argv[1:])
 
 """
 Sample test :

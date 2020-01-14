@@ -10,7 +10,8 @@ var BidSchema = new mongoose.Schema({
         bidding_price : Number, // original bidding price set by the owner.
         image : String, //image of the produce
         expiry : Number,
-        created : Number
+        created : Number,
+        live_image : String // image taken from Fresh Detect IoT sensors.
     },
     
     Bids : // list of people who bid for the product.

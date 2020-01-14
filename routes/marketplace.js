@@ -222,6 +222,7 @@ router.post("/:show/edit", middlewareObj.isUserRegistered, upload.single('produc
                         bidding_price : req.body.bidding_price, //current (default = minimum) bidding price per unit.
                         image : result.secure_url,
                         created : foundBid.Meta.created,
+                        live_image : foundBid.Meta.live_image,
                         expired : toTimestamp(req.body.expired)
                     }
                     Marketplace.findByIdAndUpdate(id, {Meta : edited_data}, (err, updatedAuction)=>{
@@ -314,7 +315,8 @@ router.post("/new", middlewareObj.isUserRegistered, upload.single("produce_pictu
                     bidding_price : float(req.body.bidding_price), // original bidding price set by the owner.
                     image : result.secure_url, //image of the produce
                     expiry : toTimestamp(req.body.expired),
-                    created : nowTime()
+                    created : nowTime(),
+                    live_image : "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fimage.freepik.com%2Ffree-icon%2Fempty-set-mathematical-symbol_318-59301.jpg&f=1&nofb=1"
                 },
                 Bids : [],
                 Owner : 
