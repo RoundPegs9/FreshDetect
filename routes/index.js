@@ -5,13 +5,13 @@ const express = require("express"),
       mailingSystem = require("../middleware/mailingSystemFunctions"),
       router  = express.Router(),
       moment  = require("moment"),
+      User = require("../models/User"),
       multer  = require("multer"),
       middlewareObj = require("../middleware/index"),
       path    = require("path"),
       cryptoRandomString = require("crypto-random-string"),
       cloudinary = require("cloudinary"),
       fs      = require("fs");
-
 
 const secretKey = "scrkeyoiash389wh31207891ios=iqasimwani&jda08124sadjas.todayis14jan2020,330am.";
 function deleteFile(req){
