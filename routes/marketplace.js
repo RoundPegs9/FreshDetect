@@ -223,7 +223,8 @@ router.post("/:show/edit", middlewareObj.isUserRegistered, upload.single('produc
                         image : result.secure_url,
                         created : foundBid.Meta.created,
                         live_image : foundBid.Meta.live_image,
-                        expired : toTimestamp(req.body.expired)
+                        expired : toTimestamp(req.body.expired),
+                        ripeness_percentage : foundBid.Meta.ripeness_percentage,
                     }
                     Marketplace.findByIdAndUpdate(id, {Meta : edited_data}, (err, updatedAuction)=>{
                         if(err)

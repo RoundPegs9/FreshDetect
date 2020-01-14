@@ -11,7 +11,8 @@ var BidSchema = new mongoose.Schema({
         image : String, //image of the produce
         expiry : Number,
         created : Number,
-        live_image : String // image taken from Fresh Detect IoT sensors.
+        live_image : String, // image taken from Fresh Detect IoT sensors.
+        ripeness_percentage : {type : Number, default : 0.0}
     },
     
     Bids : // list of people who bid for the product.
