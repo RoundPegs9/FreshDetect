@@ -8,7 +8,6 @@ const request = require("request"),
  
 
 router.get("/endpoint/:product_id", (req, res)=>{
-
     const id = req.params.product_id;
     const image_url = req.query.image_link;
     const temp_scr = req.query.temp_scr, 
