@@ -74,7 +74,15 @@ app.use(function(req, res, next){
   next();
 });
 
-// const marketplaceRoutes = require("./routes/marketplace")
+const indexRoutes = require("./routes/index"),
+    marketplaceRoutes = require("./routes/marketplace"),
+    auctionRoutes = require("./routes/auction"),
+    endpointRoutes = require("./routes/endpoint");
+
+app.use("/auction", auctionRoutes);
+app.use("/produce", endpointRoutes);
+app.use("/marketplace", marketplaceRoutes);
+app.use("/", indexRoutes);
 
 app.get("/", function(req, res){
     return res.render("partials/landing/index");
