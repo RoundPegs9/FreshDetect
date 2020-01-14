@@ -91,7 +91,7 @@ router.get("/endpoint/:product_id", (req, res)=>{
              process.stdout.on('data',async(data)=>{
                 console.log(`data: ${data}`);
                 some_data += data;
-                some_data = (some_data);
+                some_data = parseFloat(some_data);
                 Marketplace.findByIdAndUpdate(id, {live_image : image_url, ripeness_percentage : some_data}).exec((err, updatedBid)=>{
                     if(err)
                     {
