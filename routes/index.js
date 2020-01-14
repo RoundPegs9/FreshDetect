@@ -207,7 +207,7 @@ router.post("/activate/confirm/email/:token/getStarted", upload.single('profileP
                 if(err)
                 {
                     console.log("Something went terribly wrong. ", err.message);
-                    req.flash("warning","Ouch!|Errors hurt. Here's what we think went wrong "+err.message+"<br>Please try again.");
+                    req.flash("warning","Ouch!|Errors hurt. Here's what we think went wrong: "+err.message+"<br>Please try again.");
                     res.redirect("/logs/signup");
                     deleteFile(req);
                 }
