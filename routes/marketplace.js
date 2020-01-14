@@ -168,6 +168,27 @@ router.post("/:show/cancelbid", middlewareObj.isUserRegistered, (req, res)=>{
     });
 });
 
+router.get("/:show/edit", middlewareObj.isUserRegistered, (req, res)=>{
+    const id = req.params.id;
+    Marketplace.findById(id, (err, foundBid)=>{
+        if(err || !foundBid)
+        {
+            req.flash("error", "Produce not found| Make sure you have the right Produce ID.");
+            return res.redirect("/marketplace");
+        }
+        if (foundBid.Owner.user_id == req.user._id) 
+        {
+            console.log("Taking to edit route...");
+            return res.redirect("Marketplace/edit", {data : foundBid});
+        }
+        else
+        {
+            req.flash("error", "You don't have enough permissions.");
+            return res.redirect("back");
+        }
+    });
+});
+
 router.post("/:show/edit", middlewareObj.isUserRegistered, upload.single('produce_picture'), (req, res)=>{
     const id = req.params.show;
     Marketplace.findById(id, (err, foundBid)=>{
