@@ -288,7 +288,7 @@ router.post("/new", middlewareObj.isUserRegistered, upload.single("produce_pictu
                 Meta : 
                 {
                     produce : req.body.produce, // name of the item
-                    description : Streq.body.description, //description of the produce
+                    description : req.body.description, //description of the produce
                     quantity : req.body.quantity, //number of items of produce
                     bidding_price : float(req.body.bidding_price), // original bidding price set by the owner.
                     image : result.secure_url, //image of the produce
@@ -304,6 +304,38 @@ router.post("/new", middlewareObj.isUserRegistered, upload.single("produce_pictu
                     profilePicture : req.user.profilePicture,
                 }
             }
+            function createProduct(product_information) {
+                Marketplace.create(product_information, (err, createdProduct)=>{
+                    if(err)
+                    {
+                        if (err.code === 11000) {
+                            //mongo duplicate index error
+                            Marketplace.collection.dropIndex('username_1', (err, indexDropped)=>{
+                                if(err)
+                                {
+                                    throw new Error(err.message);
+                                }
+                                else
+                                {
+                                    createProduct(product_information);
+                                }
+                            });
+                        }
+                        else
+                        {
+                            console.log("Some other general error ~ 326.");
+                            throw new Error(err.message);
+                        }
+                    }
+                    else
+                    {
+                        console.log("New Product created.");
+                    }
+                });
+            }
+            createProduct(data);
+            req.flash("success", "Product Added|Your product has been added.");
+            return res.redirect("/marketplace");
         });
     }
     else
@@ -318,4 +350,7 @@ router.post("/new", middlewareObj.isUserRegistered, upload.single("produce_pictu
 router.get("/new", middlewareObj.isUserRegistered, (req, res)=>{
     return res.render("Marketplace/new");
 });
+
+
+
 module.exports = router;
