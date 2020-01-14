@@ -116,7 +116,7 @@ router.post("/:show/bid", middlewareObj.isUserRegistered, (req, res)=>{
         }
         if(req.user._id != foundBid.Owner.user_id)
         {
-            const price = float(req.body.bidding_price);
+            const price = parseFloat(req.body.bidding_price);
             var bid_info = 
             {
                 user_id : req.user._id,
@@ -313,7 +313,7 @@ router.post("/new", middlewareObj.isUserRegistered, upload.single("produce_pictu
                     produce : req.body.produce, // name of the item
                     description : req.body.description, //description of the produce
                     quantity : req.body.quantity, //number of items of produce
-                    bidding_price : float(req.body.bidding_price), // original bidding price set by the owner.
+                    bidding_price : (req.body.bidding_price), // original bidding price set by the owner.
                     image : result.secure_url, //image of the produce
                     expiry : toTimestamp(req.body.expired),
                     created : nowTime(),

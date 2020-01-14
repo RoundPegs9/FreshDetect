@@ -1,14 +1,12 @@
 const request = require("request"),
     Marketplace = require("../models/Bid"),
     express = require("express"),
+    path = require("path"),
     spawn = require("child_process").spawn,
     router = express(),
     link = "https://eastus2.api.cognitive.microsoft.com/customvision/v3.0/Prediction/b0edd4db-a0fc-4395-80ce-0a19d78a0e56/classify/iterations/Iteration2/url";
  
 
-//ripe = 0
-//green = 1
-//overripe = 2
 router.get("/endpoint/:product_id", (req, res)=>{
 
     const id = req.params.product_id;
@@ -36,7 +34,50 @@ router.get("/endpoint/:product_id", (req, res)=>{
         }
         request.post(options, (error, response, body)=>{
             body = JSON.parse(body);
-            var data = [float(body.predictions[0].probability), float(body.predictions[1].probability), float(body.predictions[2].probability), float(temp_scr), float(hum_scr), float(voc_scr)];
+            body = body.predictions;
+            var green = 0,
+                ripe = 0,
+                overripe = 0;
+            if(body[0].tagName == "green")
+            {
+                green = parseFloat(body[0].probability);
+            }
+            else if(body[0].tagName == "ripe")
+            {
+                ripe = parseFloat(body[0].probability);
+            }
+            else if(body[0].tagname == "overripe")
+            {
+                overripe = parseFloat(body[0].probability);
+            }
+
+            if(body[1].tagName == "green")
+            {
+                green = parseFloat(body[1].probability);
+            }
+            else if(body[1].tagName == "ripe")
+            {
+                ripe = parseFloat(body[1].probability);
+            }
+            else if(body[1].tagname == "overripe")
+            {
+                overripe = parseFloat(body[1].probability);
+            }
+
+            if(body[2].tagName == "green")
+            {
+                green = parseFloat(body[2].probability);
+            }
+            else if(body[2].tagName == "ripe")
+            {
+                ripe = parseFloat(body[2].probability);
+            }
+            else if(body[2].tagname == "overripe")
+            {
+                overripe = parseFloat(body[2].probability);
+            }
+
+            var data = [ripe, green, overripe, parseFloat(temp_scr), parseFloat(hum_scr), parseFloat(voc_scr)];
             const process = spawn('python', [
                 "-u",
                 path.join(__dirname,"../middleware/endpoint.py"),
@@ -51,7 +92,7 @@ router.get("/endpoint/:product_id", (req, res)=>{
              process.stdout.on('data',async(data)=>{
                 console.log(`data: ${data}`);
                 some_data += data;
-                some_data = float(some_data);
+                some_data = (some_data);
                 Marketplace.findByIdAndUpdate(id, {live_image : image_url, ripeness_percentage : some_data}).exec((err, updatedBid)=>{
                     if(err)
                     {

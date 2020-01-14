@@ -33,13 +33,8 @@ def calculate_freshness_score(ripe_score, green_score, overripe_score, temp_scr,
 
     
 def main(argv):
-    freshness_score = calculate_freshness_score(argv[0],argv[1],argv[2],argv[3],argv[4],argv[5])
+    data = argv[0].split(",")
+    freshness_score = calculate_freshness_score(float(data[0]),float(data[1]), float(data[2]), float(data[3]), float(data[4]), float(data[5]))
     print(freshness_score)
-
 if __name__ == "__main__":
     main(sys.argv[1:])
-
-"""
-Sample test :
---> print(calculate_freshness_score(0.2, 0.79, 0.01, 20, 0.93, 23))
-"""        
