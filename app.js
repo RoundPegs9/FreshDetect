@@ -2,6 +2,7 @@ const express = require("express"),
       bodyParser = require("body-parser"),
       flash   = require("connect-flash"),
       moment  = require("moment"),
+      mongoose = require("mongoose"),
       compression = require('compression');
       passport = require("passport"),
       LocalStrategy = require("passport-local"),
@@ -9,6 +10,7 @@ const express = require("express"),
       cookieSession     = require("cookie-session"),
       dotenv        = require("dotenv"),
       expressSanitizer = require('express-sanitizer'),
+      User = require("./models/User"),
       app = express();
 
     
@@ -28,17 +30,17 @@ app.use(methodOverride("_method"));
 
 app.use(cookieSession({
     maxAge : 360*3600*1000,
-    keys   : ['mynameisqasimwaniandihavenoideawhatimdoingwithmylife.todayis14jan2020,330am.']
+    keys   : ['scrkeyoiash389wh31207891iosjda08124sadjas.todayis14jan2020,330am.']
 }));
 
 //initialize passport
-// app.use(passport.initialize());
-// app.use(passport.session());
+app.use(passport.initialize());
+app.use(passport.session());
 
 var MemoryStore = require("memorystore")(require('express-session'));
 
 app.use(require("express-session")({
-   secret : "mynameisqasimwaniandikindahavenoideawhatimdoingwithmylife.todayis14jan2020,330am.",
+   secret : "scrkeyoiash389wh31207891ios=iqasimwani&jda08124sadjas.todayis14jan2020,330am.",
    store: new MemoryStore({
     checkPeriod: 86400000 // prune expires entries every 24h
   }),
@@ -46,22 +48,28 @@ app.use(require("express-session")({
    saveUninitialized : false
 }));
 
-// passport.use(new LocalStrategy(User.authenticate()));
-// passport.serializeUser(User.serializeUser());
-// passport.deserializeUser(User.deserializeUser());
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 //using flash for messages and better user interface
 app.use(flash());  
 
-// passport.serializeUser((user, done) =>{
-//   done(null, user.id);  
-// });
-// passport.deserializeUser((id, done) =>{
-//   User.findById(id).then((user)=>
-//   {
-//     done(null, user);  
-//   }); 
-// });
+passport.serializeUser((user, done) =>{
+  done(null, user.id);  
+});
+passport.deserializeUser((id, done) =>{
+  User.findById(id).then((user)=>
+  {
+    done(null, user);  
+  }); 
+});
+
+mongoose.set('useCreateIndex', true);
+mongoose.set('useFindAndModify', false);
+
+mongoose.Promise = global.Promise;
+mongoose.connect("mongodb://"+process.env.mongoDB+"/freshDetect",{ useNewUrlParser: true , useUnifiedTopology: true});
 
 
 app.use(function(req, res, next){

@@ -13,7 +13,7 @@ const express = require("express"),
       fs      = require("fs");
 
 
-const secretKey = "";
+const secretKey = "scrkeyoiash389wh31207891ios=iqasimwani&jda08124sadjas.todayis14jan2020,330am.";
 
 router.get("/about",(req, res)=>{
     return res.render("./partials/landing/about");
