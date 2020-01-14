@@ -1,0 +1,51 @@
+<br><br><br><br><br>
+<% if(error && error.length > 0) { %>
+  <div class="ui negative message container transition hidden">
+  <i class="close icon"></i>
+  <%if(error.toString().split("|")[0].trim() !== ""){%>
+    <div class="header">
+        <%-error.toString().split("|")[0]%>
+    </div>
+  <%}%>
+  <p><%-error.toString().split("|")[1]%></p>
+</div>
+  <% } else if(success && success.length > 0) { %>
+  <div class="ui positive container message">
+  <i class="close icon"></i>
+    <%if(success.toString().split("|")[0].trim() !== ""){%>
+    <div class="header">
+        <%-success.toString().split("|")[0]%>
+    </div>
+  <%}%>
+  <p><%-success.toString().split("|")[1]%></p>
+</div>
+  <% } else if(warning && warning.length > 0) { %>
+ <div class="ui orange container message">
+  <i class="close icon"></i>
+  <%if(warning.toString().split("|")[0].trim() !== ""){%>
+    <div class="header">
+        <%-warning.toString().split("|")[0]%>
+    </div>
+  <%}%>
+  <p><%-warning.toString().split("|")[1]%></p>
+</div>
+  <% } else if(info && info.length > 0) { %>
+<div class="ui blue container message">
+  <i class="close icon"></i>
+  <%if(info.toString().split("|")[0].trim() !== ""){%>
+    <div class="header">
+        <%-info.toString().split("|")[0]%>
+    </div>
+  <%}%>
+  <p><%-info.toString().split("|")[1]%></p>
+</div>
+<% } %>
+
+<script>
+$('.ui.message')
+  .transition('pulse')
+;
+$(".icon").click(()=>{
+    $(".ui.message").hide(500);
+})
+</script>

@@ -12,7 +12,7 @@ var mailingObj = {};
                 pass : process.env.GmailPass
             }
         });
-        var confirmationLink = process.env.emailConfirmationLink+'/activate/email/freshdetect/'+token;
+        var confirmationLink = process.env.emailConfirmationLink+'/activate/email/freshdetect/qw3600/'+token;
         let mailOptions = {
             from : process.env.GmailUser,
             to  :  emailAddress,
@@ -40,7 +40,7 @@ var mailingObj = {};
 
 };
 
-mailingObj.welcomeEmail = function(name, emailAddress, university)
+mailingObj.welcomeEmail = function(name, emailAddress)
 {
     
     nodemailer.createTestAccount(function(err, account){

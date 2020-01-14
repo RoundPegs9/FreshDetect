@@ -7,7 +7,7 @@ var UserSchema = new mongoose.Schema({
     password : String,
     username: { type: String, lowercase: true },
     phone   : String,
-    profilePicture : {type:String, default : "https://cdn150.picsart.com/upscale-245339439045212.png?r1024x1024"},
+    profilePicture : {type:String},
     created : String
 });
 UserSchema.plugin(passportLocalMongoose);
