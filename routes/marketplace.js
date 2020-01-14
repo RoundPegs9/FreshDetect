@@ -372,6 +372,4 @@ router.get("/new", middlewareObj.isUserRegistered, (req, res)=>{
     return res.render("Marketplace/new");
 });
 
-
-
 module.exports = router;
