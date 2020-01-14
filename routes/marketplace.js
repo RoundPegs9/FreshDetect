@@ -116,7 +116,7 @@ router.post("/:show/bid", middlewareObj.isUserRegistered, (req, res)=>{
         }
         if(req.user._id != foundBid.Owner.user_id)
         {
-            const price = req.body.bidding_price;
+            const price = float(req.body.bidding_price);
             var bid_info = 
             {
                 user_id : req.user._id,
@@ -127,6 +127,9 @@ router.post("/:show/bid", middlewareObj.isUserRegistered, (req, res)=>{
             };
             foundBid.Bids.push(bid_info);
             foundBid.save();
+            mailingSystem.sendBidEmail(req.user.name, foundBid.Owner.name, foundBid.Owner.email, foundBid.Meta.produce, foundBid._id, foundBid.Meta.bidding_price);
+            req.flash("success", "Bid Placed on " + foundBid.Meta.produce + " successfully| Notification sent.");
+            return res.redirect("/marketplace/" + id);
         }
         else
         {
@@ -154,6 +157,8 @@ router.post("/:show/cancelbid", middlewareObj.isUserRegistered, (req, res)=>{
                 }
             }
             foundBid.save();
+            req.flash("success", "Bid Cancelled successful");
+            return res.redirect("/marketplace/" + id);
         }
         else
         {
@@ -183,7 +188,7 @@ router.post("/:show/edit", middlewareObj.isUserRegistered, upload.single('produc
                         console.log(error);
                         // flash for cloudinary Upload problem...
                         deleteFile(req);
-                        req.flash("error","Image Upload error|Something went wrong while trying to upload your profile picture onto our server.<br>Possible error: "+error);
+                        req.flash("error","Image Upload error|Something went wrong while trying to upload your Produce picture onto our server.<br>Possible error: "+error);
                         return res.redirect(req.get('referer'));
                     }
                     console.log(profilePicture);
@@ -263,5 +268,54 @@ router.post("/:show/delete", middlewareObj.isUserRegistered, (req, res)=>{
             return res.redirect("back");
         }
     });
+});
+
+router.post("/new", middlewareObj.isUserRegistered, upload.single("produce_picture"), (req, res)=>{
+    if(req.file != undefined)
+    {
+        var cloudinaryLink = "./" + req.file.path;
+        cloudinary.v2.uploader.upload(cloudinaryLink, {"crop":"limit","tags":[username, name, 'produce', 'updated produce'], folder: `produce/${username.toLowerCase().split("@")[0]} - ${name}`,use_filename: false}, function(error, result) {
+            if(error)
+            {
+                console.log(error);
+                // flash for cloudinary Upload problem...
+                deleteFile(req);
+                req.flash("error","Image Upload error|Something went wrong while trying to upload your Produce picture onto our server.<br>Possible error: "+error);
+                return res.redirect(req.get('referer'));
+            }
+            var data = 
+            {
+                Meta : 
+                {
+                    produce : req.body.produce, // name of the item
+                    description : Streq.body.description, //description of the produce
+                    quantity : req.body.quantity, //number of items of produce
+                    bidding_price : float(req.body.bidding_price), // original bidding price set by the owner.
+                    image : result.secure_url, //image of the produce
+                    expiry : toTimestamp(req.body.expired),
+                    created : nowTime()
+                },
+                Bids : [],
+                Owner : 
+                {
+                    user_id : req.user._id,
+                    name : req.user.name,
+                    email : req.user.username,
+                    profilePicture : req.user.profilePicture,
+                }
+            }
+        });
+    }
+    else
+    {
+        req.flash("warning", "Missing Produce Picture|Please select an image for your product.");
+        return res.redirect(req.get('referrer'));
+    }
+    
+    
+});
+
+router.get("/new", middlewareObj.isUserRegistered, (req, res)=>{
+    return res.render("Marketplace/new");
 });
 module.exports = router;

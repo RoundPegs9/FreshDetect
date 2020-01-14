@@ -14,7 +14,7 @@ var mailingObj = {};
         });
         var confirmationLink = process.env.emailConfirmationLink+'/activate/email/freshdetect/qw?token='+token;
         let mailOptions = {
-            from : process.env.GmailUser,
+            from : process.env.gmail_em,
             to  :  emailAddress,
             subject : 'FreshDetect: Registration Confirmation Email',
             html : `<h4>Hey ${name}, </h4>`+
@@ -54,7 +54,7 @@ mailingObj.welcomeEmail = function(name, emailAddress)
         });
         var marketPlace = process.env.emailConfirmationLink + '/marketplace'
         let mailOptions = {
-            from : process.env.GmailUser,
+            from : process.env.gmail_em,
             to  :  emailAddress,
             subject : 'Welcome to the FreshDetect Community',
             html : `<h1>Track your produce in real time anywhere in the world!</h1>`+
@@ -80,4 +80,41 @@ mailingObj.welcomeEmail = function(name, emailAddress)
     });
 };
 
+mailingObj.sendBidEmail = function(from_name, to_email, to_name, produce_name, produce_id, bidding_price)
+{
+    
+    nodemailer.createTestAccount(function(err, account){
+        let transporter = nodemailer.createTransport({
+            service: 'Gmail',
+            auth:
+            {
+                user : process.env.gmail_em,
+                pass : process.env.gmail_pas
+            }
+        });
+        var marketPlace = process.env.emailConfirmationLink + '/marketplace/'+produce_id;
+        let mailOptions = {
+            from : process.env.gmail_em,
+            to  :  to_email,
+            subject : 'You have a new bid from ' + from_name,
+            html : `<h3>${to_name},</h3>`+
+            `<h4>${from_name} just placed a bid on your item, ${produce_name} for a bidding price of $${bidding_price}.</h4>`+
+            `<p>Log in for more details on your product <a href="${marketPlace}">Click Here.</a></p>`+
+            `<hr><h3 style='color:black;'><strong>Freshdetect</strong>,<br> Tackling Supply chain inefficiencies one step at a time. </h3>`
+        }
+    
+        transporter.sendMail(mailOptions, function(err, info){
+            if(err)
+            {
+                console.log(err);
+            }
+            else
+            {
+                console.log('Message sent successfully', info.messageId);
+                console.log("**************");
+                console.log(info);
+            }
+        });
+    });
+};
 module.exports = mailingObj;

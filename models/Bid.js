@@ -7,7 +7,7 @@ var BidSchema = new mongoose.Schema({
         produce : String, // name of the item
         description : String, //description of the produce
         quantity : Number, //number of items of produce
-        bidding_price : Number, //current (default = minimum) bidding price per unit.
+        bidding_price : Number, // original bidding price set by the owner.
         image : String, //image of the produce
         expiry : Number,
         created : Number
