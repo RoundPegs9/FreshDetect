@@ -2,7 +2,7 @@ const express = require("express"),
       passport = require("passport"),
       jwt       = require("jsonwebtoken"),
       methodOverride   = require("method-override"),
-      mailingSystem = require("../middleware/mailingSystemFunctions");
+      mailingSystem = require("../middleware/mailingSystemFunctions"),
       router  = express.Router(),
       moment  = require("moment"),
       multer  = require("multer"),
@@ -88,6 +88,7 @@ router.get("/start", (req, res)=>{
 //Authentication Routes
 router.post("/register/newUser/base-none", function(req,res){
     if(!req.user){
+        
         var e = req.body.email.split("@")[1];
         if(req.body.name.trim().split(" ").length <= 1)
         {
@@ -134,10 +135,8 @@ router.post("/register/newUser/base-none", function(req,res){
 
 });
 
-
-router.get("/activate/email/freshdetect/qw3600/:token", function(req, res){
-
-    var token = req.params.token;
+router.get("/activate/email/freshdetect/qw", function(req, res){
+    var token = req.query.token;
     jwt.verify(token, secretKey, function(err, decoded){
         if(err && err.message === 'jwt expired')
         {
@@ -147,7 +146,6 @@ router.get("/activate/email/freshdetect/qw3600/:token", function(req, res){
         }
         else if(!err)
         {
-            // console.log(decoded);
             User.findOne({username:decoded.email}, function(err, foundUser){
                 if(err)
                 {
@@ -159,7 +157,7 @@ router.get("/activate/email/freshdetect/qw3600/:token", function(req, res){
                 {
                     // flash for declaring "You have already created an account"
                     req.flash("error","Account Exists!|That account exists. Sign up instead?");
-                    res.redirect("/start");
+                    return res.redirect("/start");
                 }
                 else
                 {
@@ -175,7 +173,6 @@ router.get("/activate/email/freshdetect/qw3600/:token", function(req, res){
         }
         
     });
-    
 });
 
 passport.serializeUser((user, done) => {
@@ -200,11 +197,11 @@ router.post("/activate/confirm/email/:token/getStarted", upload.single('profileP
         // User profile information
             var username = verify.email.trim(),
                 name = verify.name.trim(),
-                isValidated = false,
+                isValidated = true,
                 phone = req.body.phone,
                 password  = req.body.password,
                 passwordConfirmation = req.body.passwordConfirmation,
-                profilePicture = "https://cdn150.picsart.com/upscale-245339439045212.png?r1024x1024";
+                profilePicture = "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn150.picsart.com%2Fupscale-245339439045212.png%3Fr1024x1024&f=1&nofb=1";
 
             User.findOne({username : username}, function(err, foundUser){
                 if(err)
@@ -231,7 +228,7 @@ router.post("/activate/confirm/email/:token/getStarted", upload.single('profileP
                         req.flash("error","Passwords not equal.|Make sure confirmation password is equal to your password.");
                         return res.redirect(req.get('referer'));
                     }
-                    else
+                    else if(req.file != undefined)
                     {
                         var cloudinaryLink = "./" + req.file.path;
                         console.log(cloudinaryLink);
@@ -272,6 +269,31 @@ router.post("/activate/confirm/email/:token/getStarted", upload.single('profileP
                             });
                         });
                     }
+                    else
+                    {
+                        // create user.
+                        User.register(new User({username:username, isValidated : isValidated,name:name, phone:phone, profilePicture:profilePicture, created: moment().format('MMMM Do YYYY, h:mm:ss a')}), password, function(err, userAccount){
+                            if(err){
+                                console.log(err, " Whoops. Mah bad.");
+                                req.flash("error", "Whoops|Something went wrong.<br>"+err.message);
+                                res.redirect('/logs/signup');
+                            }
+                            else
+                            {
+                                req.login(userAccount, function(err) {
+                                    if (err) 
+                                    { 
+                                        return next(err); 
+                                    }
+                                    req.flash("success", "Thanks for joining the FreshDetect!");
+                                    console.log("User created and logged...");
+                                    mailingSystem.welcomeEmail(userAccount.name, userAccount.username);
+                                    return res.redirect("/marketplace");
+                                });
+                            }
+                        });
+                    }
+                    
                 }
             });
         }

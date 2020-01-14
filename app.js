@@ -69,7 +69,7 @@ mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify', false);
 
 mongoose.Promise = global.Promise;
-mongoose.connect("mongodb://"+process.env.mongoDB+"/freshDetect",{ useNewUrlParser: true , useUnifiedTopology: true});
+mongoose.connect("mongodb://"+process.env.mongoDB+"/fresh-detect",{ useNewUrlParser: true , useUnifiedTopology: true});
 
 
 app.use(function(req, res, next){
@@ -87,9 +87,9 @@ const indexRoutes = require("./routes/index"),
     auctionRoutes = require("./routes/auction"),
     endpointRoutes = require("./routes/endpoint");
 
-app.use("/auction", auctionRoutes);
-app.use("/produce", endpointRoutes);
-app.use("/marketplace", marketplaceRoutes);
+// app.use("/auction", auctionRoutes);
+// app.use("/produce", endpointRoutes);
+// app.use("/marketplace", marketplaceRoutes);
 app.use("/", indexRoutes);
 
 app.get("/", function(req, res){

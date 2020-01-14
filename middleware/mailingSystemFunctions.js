@@ -8,11 +8,11 @@ var mailingObj = {};
             service: 'Gmail',
             auth:
             {
-                user : process.env.GmailUser,
-                pass : process.env.GmailPass
+                user : process.env.gmail_em,
+                pass : process.env.gmail_pas
             }
         });
-        var confirmationLink = process.env.emailConfirmationLink+'/activate/email/freshdetect/qw3600/'+token;
+        var confirmationLink = process.env.emailConfirmationLink+'/activate/email/freshdetect/qw?token='+token;
         let mailOptions = {
             from : process.env.GmailUser,
             to  :  emailAddress,
@@ -48,8 +48,8 @@ mailingObj.welcomeEmail = function(name, emailAddress)
             service: 'Gmail',
             auth:
             {
-                user : process.env.GmailUser,
-                pass : process.env.GmailPass
+                user : process.env.gmail_em,
+                pass : process.env.gmail_pas
             }
         });
         var marketPlace = process.env.emailConfirmationLink + '/marketplace'
@@ -79,3 +79,5 @@ mailingObj.welcomeEmail = function(name, emailAddress)
         });
     });
 };
+
+module.exports = mailingObj;

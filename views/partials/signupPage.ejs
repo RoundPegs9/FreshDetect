@@ -1,13 +1,14 @@
-<%include header%>
+<%- include("../partials/header") %>
+<div class="ui container center aligned">
 <form action="/activate/confirm/email/<%=token%>/getStarted" method="POST" class="ui center aligned form" enctype="multipart/form-data">
 
+  <div class="fields">
     <div class="field">
     <label>US (+1) Phone Number <span class="reqSym">*</span></label>
         <div class="ui input left icon"><i class="ui phone icon"></i>
             <input required placeholder="(314) 159-2653" type="tel" name="phone" pattern="(1\s?)?((\([0-9]{3}\))|[0-9]{3})[\s\-]?[\0-9]{3}[\s\-]?[0-9]{4}"></div>
     </div>
   </div>
-  <div class="fields">
     <div class="field">
         <label>Create your password <span class="reqSym">*</span></label>
         <div class="ui input left icon"><i class="ui lock icon"></i>
@@ -18,14 +19,12 @@
         <div class="ui input left icon"><i class="ui key icon"></i>
         <input placeholder="Confirm your password" required type="password" autocomplete="on" name="passwordConfirmation"></div>
     </div>
-  </div>
-  </div>
   <div class="field profilePicture">
       <label>Upload your profile picture to help users identify you <span style="color: gray;">Optional</span></label>
       <span id="imageError" class="ui red tiny header"></span>
 
           <div class="ui input left icon"><i class="ui upload icon"></i>
-          <input accept="image/x-png,image/gif,image/jpeg" required id="image"  type="file" name="profilePicture">
+          <input accept="image/x-png,image/gif,image/jpeg" id="image"  type="file" name="profilePicture">
           </div>
           
   </div>
@@ -38,6 +37,6 @@
 
     </div>
 </form>
-
+</div>
 <br><br>
-<%include footer%>
+<%- include("../partials/footer") %>

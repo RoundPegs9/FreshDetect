@@ -1,8 +1,26 @@
-<h1>
-    Login / Sign Up Stuff here...
-</h1>
-<form method="POST" action="/register/newUser/base-none">
-    <input type="text" name="name">
-    <br>
-    <input type="email" name="email">
-</form>
+<%- include("../partials/header") %>
+<div class="ui container center aligned">
+    <form action="/register/newUser/base-none" method="POST" class="ui center aligned form">
+    <div class="fields">
+        <div class="field">
+            <label>Email address <span class="reqSym">*</span></label>
+            <div class="ui input left icon"><i class="ui lock icon"></i>
+            <input placeholder="Enter your email address" required autocomplete="on" type="email" name="email"></div>
+        </div>
+        <div class="field">
+            <label>Enter your full name <span class="reqSym">*</span></label>
+            <div class="ui input left icon"><i class="ui key icon"></i>
+            <input placeholder="Eg. Nikola Tesla" required type="text" autocomplete="on" name="name"></div>
+        </div>
+    </div>
+        <button class="ui center aligned animated blue button">
+            <div class="visible content">Get Started</div>
+            <div class="hidden content">
+                Send verification email.
+            </div>
+        </button>
+        </div>
+    </form>
+</div>
+<br><br>
+<%- include("../partials/footer") %>
