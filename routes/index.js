@@ -82,7 +82,6 @@ router.get("/start", (req, res)=>{
         req.flash("warning", "You're already logged in.");
         return res.redirect("/marketplace");
     }
-    
 });
 
 //Authentication Routes
@@ -123,7 +122,7 @@ router.post("/register/newUser/base-none", function(req,res){
                 var token = jwt.sign(user,secretKey, { expiresIn: '1h' });
                 mailingSystem.signUpConfirmationEmail(token, user.email, user.name);
                 let mail = user.email;
-                res.redirect(`/check-your-email/${mail}/for-confirmation-link/${token}`); 
+                return res.redirect(`/check-your-email/${mail}/for-confirmation-link/${token}`); 
             }   
         });    
     }
@@ -200,9 +199,16 @@ router.post("/activate/confirm/email/:token/getStarted", upload.single('profileP
                 isValidated = true,
                 phone = req.body.phone,
                 password  = req.body.password,
+                _type = req.body.type,
                 passwordConfirmation = req.body.passwordConfirmation,
                 profilePicture = "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn150.picsart.com%2Fupscale-245339439045212.png%3Fr1024x1024&f=1&nofb=1";
-
+            if (_type == "farmer") {
+                _type = 0;
+            }
+            else
+            {
+                _type = 1;
+            }
             User.findOne({username : username}, function(err, foundUser){
                 if(err)
                 {
@@ -247,7 +253,7 @@ router.post("/activate/confirm/email/:token/getStarted", upload.single('profileP
                             deleteFile(req);
                             isValidated = true;
                             // create user.
-                            User.register(new User({username:username, isValidated : isValidated,name:name, phone:phone, profilePicture:profilePicture, created: moment().format('MMMM Do YYYY, h:mm:ss a')}), password, function(err, userAccount){
+                            User.register(new User({_type : _type, username:username, isValidated : isValidated,name:name, phone:phone, profilePicture:profilePicture, created: moment().format('MMMM Do YYYY, h:mm:ss a')}), password, function(err, userAccount){
                                 if(err){
                                     console.log(err, " Whoops. Mah bad.");
                                     req.flash("error", "Whoops|Something went wrong.<br>"+err.message);
@@ -272,7 +278,7 @@ router.post("/activate/confirm/email/:token/getStarted", upload.single('profileP
                     else
                     {
                         // create user.
-                        User.register(new User({username:username, isValidated : isValidated,name:name, phone:phone, profilePicture:profilePicture, created: moment().format('MMMM Do YYYY, h:mm:ss a')}), password, function(err, userAccount){
+                        User.register(new User({_type : _type, username:username, isValidated : isValidated,name:name, phone:phone, profilePicture:profilePicture, created: moment().format('MMMM Do YYYY, h:mm:ss a')}), password, function(err, userAccount){
                             if(err){
                                 console.log(err, " Whoops. Mah bad.");
                                 req.flash("error", "Whoops|Something went wrong.<br>"+err.message);
@@ -317,8 +323,8 @@ router.post("/logout", function(req, res){
 });
 router.post("/login", passport.authenticate("local", {
     successRedirect : "/marketplace",
-    failureRedirect : "/logs/signin",
-    failureFlash : "Wait a minute|Invalid username and/or password<br><strong>Please log in with your HitchHiqe registered .edu account</strong>",
+    failureRedirect : "/start",
+    failureFlash : "Wait a minute|Invalid username and/or password<br><strong>Please log in with your FreshDetect associated email address.</strong>",
  }), function(req, res) {
      console.log("A user just logged in!");
 });
@@ -331,7 +337,7 @@ router.get("/check-your-email/:email/for-confirmation-link/:token", function(req
         {
             // add flash indicating link expired
             console.log('Link Expired');
-            res.send("Link has expired.<br>You need to re-initialize your sign up procedure. <a href='/logs/signup'>Click to go back to sign up</a>.");
+            return res.send("Link has expired.<br>You need to re-initialize your sign up procedure. <a href='/start'>Click to go back to sign up</a>.");
         }
         else if(!err)
         {
@@ -341,8 +347,8 @@ router.get("/check-your-email/:email/for-confirmation-link/:token", function(req
         {
             // general error --> Add Flash
             req.flash("error","%U^C#K|Something went wrong. Please try again later if the problem persists.<br><strong>We apologize for any inconvenience</strong>");
-            console.log("EHEHEH")
-            res.redirect("/start");
+            console.log("EHEHEH");
+            return res.redirect("/start");
         }        
     });
 });
