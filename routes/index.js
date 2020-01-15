@@ -84,6 +84,19 @@ router.get("/start", (req, res)=>{
     }
 });
 
+router.get("/startnew", (req, res)=>{
+    if(!req.user)
+    {
+        return res.render("./partials/newauth");    
+    }
+    else
+    {
+        req.flash("warning", "You're already logged in.");
+        return res.redirect("/marketplace");
+    }
+});
+
+
 //Authentication Routes
 router.post("/register/newUser/base-none", function(req,res){
     if(!req.user){
