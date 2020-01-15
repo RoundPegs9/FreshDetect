@@ -69,7 +69,7 @@ mongoose.set('useCreateIndex', true);
 mongoose.set('useFindAndModify', false);
 
 mongoose.Promise = global.Promise;
-mongoose.connect("mongodb://"+process.env.mongoDB+"/fresh-detect",{ useNewUrlParser: true , useUnifiedTopology: true});
+mongoose.connect("mongodb://"+process.env.mongoDB+"/freshdetect",{ useNewUrlParser: true , useUnifiedTopology: true});
 
 
 app.use(function(req, res, next){
