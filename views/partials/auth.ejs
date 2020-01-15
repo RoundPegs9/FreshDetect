@@ -23,4 +23,30 @@
     </form>
 </div>
 <br><br>
+<% if(!currentUser) {%>
+<div class="ui container center aligned">
+    <form action="/login" method="POST" class="ui center aligned form">
+    <div class="fields">
+        <div class="field">
+            <label>Email address <span class="reqSym">*</span></label>
+            <div class="ui input left icon"><i class="ui lock icon"></i>
+            <input placeholder="Enter your email address" required autocomplete="on" type="email" name="username"></div>
+        </div>
+        <div class="field">
+            <label>Enter your Password <span class="reqSym">*</span></label>
+            <div class="ui input left icon"><i class="ui key icon"></i>
+            <input placeholder="***" required type="password" autocomplete="on" name="password"></div>
+        </div>
+    </div>
+        <button class="ui center aligned animated blue button">
+            <div class="visible content">Login</div>
+            <div class="hidden content">
+                <i class="ui right arrow icon"></i>
+            </div>
+        </button>
+        </div>
+    </form>
+</div>
+<br><br>
+<%}%>
 <%- include("../partials/footer") %>

@@ -17,7 +17,7 @@ const express = require("express"),
 dotenv.config();
 app.use(compression());
 app.use(expressSanitizer());
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true, parameterLimit: 50000 }))
 app.set("view engine", "ejs");
 app.engine('ejs', require('ejs').__express);
 

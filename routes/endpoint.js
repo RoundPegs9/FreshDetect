@@ -177,6 +177,7 @@ router.post("/updateweb/:productID", (req, res)=>{
         }
         // see whose user_id falls below the threshold marging. type = array.
         var elem = foundAuction.Bids;
+        
     });
 });
 module.exports = router;

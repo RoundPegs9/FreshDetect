@@ -78,6 +78,7 @@ router.get("/", (req, res)=>{
     if(req.user && req.user._type == 0)
     {
         //Farmer view.
+        console.log(req.user.username);
         Marketplace.find({"Owner.user_id" : req.user._id}).exec((err, foundData)=>{
             if(err)
             {
@@ -91,7 +92,7 @@ router.get("/", (req, res)=>{
             else
             {
                 console.log("Found data for farmers from previous activity.");
-                return res.render("Marketplace/index/farmer", {data : bids});
+                return res.render("Marketplace/index/farmer", {data : foundData});
             }
         });
     }
@@ -102,9 +103,105 @@ router.get("/", (req, res)=>{
             {
                 throw new Error(err.message);
             }
+            console.log("default");
             return res.render("Marketplace/index/buyer",{data : bids});
         });
     }
+});
+
+router.post("/new", middlewareObj.isUserRegistered, upload.single("produce_picture"), (req, res)=>{
+    if(req.user._type == 0)
+    {
+        console.log("0");
+
+        if(req.file != undefined)
+        {
+            console.log("1");
+            var cloudinaryLink = "./" + req.file.path;
+            cloudinary.v2.uploader.upload(cloudinaryLink, {"crop":"limit","tags":[req.user.username, 'produce', 'updated produce'], folder: `produce/${req.user.username.toLowerCase().split("@")[0]} - ${req.user.name}`,use_filename: false}, function(error, result) {
+                if(error)
+                {
+                    console.log(error);
+                    // flash for cloudinary Upload problem...
+                    deleteFile(req);
+                    req.flash("error","Image Upload error|Something went wrong while trying to upload your Produce picture onto our server.<br>Possible error: "+error);
+                    return res.redirect(req.get('referer'));
+                }
+                var data = 
+                {
+                    Meta : 
+                    {
+                        produce : req.body.produce, // name of the item
+                        quantity : req.body.quantity, //number of items of produce
+                        bidding_price : parseFloat(req.body.bidding_price), // original bidding price set by the owner.
+                        image : result.secure_url, //image of the produce
+                        times_left : 3,
+                        created : nowTime(),
+                        from : req.body.from,
+                        to : req.body.to,
+                        weight : parseFloat(req.body.weight),
+                        live_image : "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fimage.freepik.com%2Ffree-icon%2Fempty-set-mathematical-symbol_318-59301.jpg&f=1&nofb=1"
+                    },
+                    Bids : [],
+                    Owner : 
+                    {
+                        user_id : req.user._id,
+                        name : req.user.name,
+                        email : req.user.username,
+                        profilePicture : req.user.profilePicture,
+                    }
+                }
+                function createProduct(product_information) {
+                    Marketplace.create(product_information, (err, createdProduct)=>{
+                        if(err)
+                        {
+                            if (err.code === 11000) {
+                                //mongo duplicate index error
+                                Marketplace.collection.dropIndex('username_1', (err, indexDropped)=>{
+                                    if(err)
+                                    {
+                                        throw new Error(err.message);
+                                    }
+                                    else
+                                    {
+                                        createProduct(product_information);
+                                    }
+                                });
+                            }
+                            else
+                            {
+                                console.log("Some other general error ~ 326.");
+                                throw new Error(err.message);
+                            }
+                        }
+                        else
+                        {
+                            console.log("New Product created.");
+                        }
+                    });
+                }
+                createProduct(data);
+                
+                req.flash("success", "Product Added|Your product has been added.");
+                return res.redirect("/marketplace");
+            });
+        }
+        else
+        {
+            console.log("2");
+            req.flash("warning", "Missing Produce Picture|Please select an image for your product.");
+            return res.redirect(req.get('referrer'));
+        }
+    }
+    else
+    {
+        req.flash("warning", "Only Farmers can post new products.|You're not authenticated to place shipments since you're a buyer and not a farmer.");
+        return res.redirect("/marketplace");
+    }
+});
+
+router.get("/new", middlewareObj.isUserRegistered, (req, res)=>{
+    return res.render("Marketplace/new");
 });
 
 router.get("/:id",(req, res)=>{
@@ -112,7 +209,6 @@ router.get("/:id",(req, res)=>{
     Marketplace.findById(id, (err, foundBid)=>{
         if(err || !foundBid)
         {
-            console.log("in here...");
             req.flash("error", "Produce not found| Make sure you have the right Produce ID.");
             return res.redirect("/marketplace");
         }
@@ -218,7 +314,7 @@ router.post("/:show/edit", middlewareObj.isUserRegistered, upload.single('produc
             {
                 var cloudinaryLink = "./" + req.file.path;
                 console.log(cloudinaryLink);
-                cloudinary.v2.uploader.upload(cloudinaryLink, {"crop":"limit","tags":[username, name, 'produce', 'updated produce'], folder: `produce/${username.toLowerCase().split("@")[0]} - ${name}`,use_filename: false}, function(error, result) {
+                cloudinary.v2.uploader.upload(cloudinaryLink, {"crop":"limit","tags":['produce', 'updated produce'], folder: `produce/${req.user.username.toLowerCase().split("@")[0]} - ${req.user.name}`,use_filename: false}, function(error, result) {
                     if(error)
                     {
                         console.log(error);
@@ -316,96 +412,6 @@ router.post("/:show/delete", middlewareObj.isUserRegistered, (req, res)=>{
             return res.redirect("back");
         }
     });
-});
-
-router.post("/new", middlewareObj.isUserRegistered, upload.single("produce_picture"), (req, res)=>{
-    if(req.user._type == 0)
-    {
-        if(req.file != undefined)
-        {
-            var cloudinaryLink = "./" + req.file.path;
-            cloudinary.v2.uploader.upload(cloudinaryLink, {"crop":"limit","tags":[username, name, 'produce', 'updated produce'], folder: `produce/${username.toLowerCase().split("@")[0]} - ${name}`,use_filename: false}, function(error, result) {
-                if(error)
-                {
-                    console.log(error);
-                    // flash for cloudinary Upload problem...
-                    deleteFile(req);
-                    req.flash("error","Image Upload error|Something went wrong while trying to upload your Produce picture onto our server.<br>Possible error: "+error);
-                    return res.redirect(req.get('referer'));
-                }
-                var data = 
-                {
-                    Meta : 
-                    {
-                        produce : req.body.produce, // name of the item
-                        quantity : req.body.quantity, //number of items of produce
-                        bidding_price : parseFloat(req.body.bidding_price), // original bidding price set by the owner.
-                        image : result.secure_url, //image of the produce
-                        times_left : 3,
-                        created : nowTime(),
-                        from : req.body.from,
-                        to : req.body.to,
-                        weight : parseFloat(req.body.weight),
-                        live_image : "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fimage.freepik.com%2Ffree-icon%2Fempty-set-mathematical-symbol_318-59301.jpg&f=1&nofb=1"
-                    },
-                    Bids : [],
-                    Owner : 
-                    {
-                        user_id : req.user._id,
-                        name : req.user.name,
-                        email : req.user.username,
-                        profilePicture : req.user.profilePicture,
-                    }
-                }
-                function createProduct(product_information) {
-                    Marketplace.create(product_information, (err, createdProduct)=>{
-                        if(err)
-                        {
-                            if (err.code === 11000) {
-                                //mongo duplicate index error
-                                Marketplace.collection.dropIndex('username_1', (err, indexDropped)=>{
-                                    if(err)
-                                    {
-                                        throw new Error(err.message);
-                                    }
-                                    else
-                                    {
-                                        createProduct(product_information);
-                                    }
-                                });
-                            }
-                            else
-                            {
-                                console.log("Some other general error ~ 326.");
-                                throw new Error(err.message);
-                            }
-                        }
-                        else
-                        {
-                            console.log("New Product created.");
-                        }
-                    });
-                }
-                createProduct(data);
-                req.flash("success", "Product Added|Your product has been added.");
-                return res.redirect("/marketplace");
-            });
-        }
-        else
-        {
-            req.flash("warning", "Missing Produce Picture|Please select an image for your product.");
-            return res.redirect(req.get('referrer'));
-        }
-    }
-    else
-    {
-        req.flash("warning", "Only Farmers can post new products.|You're not authenticated to place shipments since you're a buyer and not a farmer.");
-        return res.redirect("/marketplace");
-    }
-});
-
-router.get("/new", middlewareObj.isUserRegistered, (req, res)=>{
-    return res.render("Marketplace/new");
 });
 
 module.exports = router;
