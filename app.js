@@ -21,7 +21,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 app.engine('ejs', require('ejs').__express);
 
-app.use(express.static('./public'));
+app.use(express.static(__dirname + '/public'));
 
 var redirectToHTTPS = require('express-http-to-https').redirectToHTTPS
 app.use(redirectToHTTPS([/localhost:(\d{4})/], [/\/insecure/], 301));
