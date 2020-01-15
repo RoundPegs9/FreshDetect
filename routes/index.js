@@ -87,44 +87,52 @@ router.get("/start", (req, res)=>{
 //Authentication Routes
 router.post("/register/newUser/base-none", function(req,res){
     if(!req.user){
-        
-        var e = req.body.email.split("@")[1];
-        if(req.body.name.trim().split(" ").length <= 1)
+        if(!req.body.email && !req.body.name)
         {
-            console.log("full name not entered.");
-            req.flash("info","Full name not entered.|Please enter your full name.<br>Example : Nikola Tesla");
-            return res.redirect("/start");
-        }   
-        console.log(e);
-        var user = {
-            email : req.body.email.toLowerCase(),
-            name  : req.body.name.trim(),
-            isValidated : false
-        };
-        console.log(user.name);
-        User.findOne({username:user.email}, function(err, foundUser){
-            if(err)
+            console.log("In here", req.body);
+            req.flash("error", "Missing Credentials.|Please fill out the form as requested.");
+            return res.redirect("/");
+        }
+        else
+        {
+            var e = req.body.email.split("@")[1];
+            if(req.body.name.trim().split(" ").length <= 1)
             {
-                console.log("Error. From signup page");
-                req.flash("warning","Ouch!|Something went wrong. Please be patient and try again later. <br><strong>Please leave us a feedback so we can solve your problem</strong>, if it persists.");
-                return res.redirect(req.get("referer"));
-            }
-            else if(foundUser && foundUser.isValidated === true)
-            {
-                // flash for claiming user account exists!
-                console.log(foundUser.isValidated, " heck yeah!");
-                req.flash("warning","Account Exists!|Sorry, but this email address is already registered. <br>Please create a new account or log in with the entered email address.");
+                console.log("full name not entered.");
+                req.flash("info","Full name not entered.|Please enter your full name.<br>Example : Nikola Tesla");
                 return res.redirect("/start");
-            }
-            else
-            {
-                console.log("This is indeed a potentially new User");
-                var token = jwt.sign(user,secretKey, { expiresIn: '1h' });
-                mailingSystem.signUpConfirmationEmail(token, user.email, user.name);
-                let mail = user.email;
-                return res.redirect(`/check-your-email/${mail}/for-confirmation-link/${token}`); 
             }   
-        });    
+            console.log(e);
+            var user = {
+                email : req.body.email.toLowerCase(),
+                name  : req.body.name.trim(),
+                isValidated : false
+            };
+            console.log(user.name);
+            User.findOne({username:user.email}, function(err, foundUser){
+                if(err)
+                {
+                    console.log("Error. From signup page");
+                    req.flash("warning","Ouch!|Something went wrong. Please be patient and try again later. <br><strong>Please leave us a feedback so we can solve your problem</strong>, if it persists.");
+                    return res.redirect(req.get("referer"));
+                }
+                else if(foundUser && foundUser.isValidated === true)
+                {
+                    // flash for claiming user account exists!
+                    console.log(foundUser.isValidated, " heck yeah!");
+                    req.flash("warning","Account Exists!|Sorry, but this email address is already registered. <br>Please create a new account or log in with the entered email address.");
+                    return res.redirect("/start");
+                }
+                else
+                {
+                    console.log("This is indeed a potentially new User");
+                    var token = jwt.sign(user,secretKey, { expiresIn: '1h' });
+                    mailingSystem.signUpConfirmationEmail(token, user.email, user.name);
+                    let mail = user.email;
+                    return res.redirect(`/check-your-email/${mail}/for-confirmation-link/${token}`); 
+                }   
+            });
+        }    
     }
     else
     {
