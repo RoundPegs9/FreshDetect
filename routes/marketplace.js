@@ -19,20 +19,6 @@ function nowTime()
     var newDate = new Date();
     return Math.floor(newDate/1000);
 }
-function deleteFile(req){
-    if(req.file != undefined)
-    {
-        fs.unlink(req.file.path, (err) => {
-            if (err) throw err;
-            console.log('successfully deleted the L O C A L file');
-            });
-    }
-    else
-    {
-        console.log("No image found");
-    }
-
-}
 
 // Configuration of Cloudinary...
 cloudinary.config({ 
@@ -116,6 +102,21 @@ router.post("/new", middlewareObj.isUserRegistered, upload.single("produce_pictu
 
         if(req.file != undefined)
         {
+            function deleteFile(){
+                if(req.file != undefined)
+                {
+                    fs.unlink(req.file.path, (err) => {
+                        if (err) throw err;
+                        console.log('successfully deleted the L O C A L file');
+                        });
+                }
+                else
+                {
+                    console.log("No image found");
+                }
+            
+            }
+            
             console.log("1");
             var cloudinaryLink = "./" + req.file.path;
             cloudinary.v2.uploader.upload(cloudinaryLink, {"crop":"limit","tags":[req.user.username, 'produce', 'updated produce'], folder: `produce/${req.user.username.toLowerCase().split("@")[0]} - ${req.user.name}`,use_filename: false}, function(error, result) {
@@ -123,7 +124,7 @@ router.post("/new", middlewareObj.isUserRegistered, upload.single("produce_pictu
                 {
                     console.log(error);
                     // flash for cloudinary Upload problem...
-                    deleteFile(req);
+                    deleteFile();
                     req.flash("error","Image Upload error|Something went wrong while trying to upload your Produce picture onto our server.<br>Possible error: "+error);
                     return res.redirect(req.get('referer'));
                 }
@@ -319,12 +320,12 @@ router.post("/:show/edit", middlewareObj.isUserRegistered, upload.single('produc
                     {
                         console.log(error);
                         // flash for cloudinary Upload problem...
-                        deleteFile(req);
+                        deleteFile();
                         req.flash("error","Image Upload error|Something went wrong while trying to upload your Produce picture onto our server.<br>Possible error: "+error);
                         return res.redirect(req.get('referer'));
                     }
                     console.log(profilePicture);
-                    deleteFile(req);
+                    deleteFile();
                     var edited_data = 
                     {
                         produce : req.body.produce, // name of the item
