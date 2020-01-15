@@ -112,6 +112,7 @@ router.get("/:id",(req, res)=>{
     Marketplace.findById(id, (err, foundBid)=>{
         if(err || !foundBid)
         {
+            console.log("in here...");
             req.flash("error", "Produce not found| Make sure you have the right Produce ID.");
             return res.redirect("/marketplace");
         }
