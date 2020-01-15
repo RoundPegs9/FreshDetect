@@ -8,7 +8,7 @@ var BidSchema = new mongoose.Schema({
         quantity : Number, //number of items of produce
         bidding_price : Number, // original bidding price set by the owner.
         image : String, //image of the produce
-        expiry : Number,
+        times_left : Number, // rounds left
         from : String, //new
         to : String, //new
         weight : Number, //new
@@ -22,7 +22,7 @@ var BidSchema = new mongoose.Schema({
         {
             user_id : String, // id of the person who bid
             bidding_price : Number, // price the person bid with
-            freshness_score : Number, // minimum freshness level.
+            freshness_threhsold : Number, // minimum freshness level. new
             profilePicture : String, 
             name : String, // name of the bidder
             email : String, // contact information

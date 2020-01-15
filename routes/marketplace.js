@@ -14,16 +14,6 @@ const express = require("express"),
       User = require("../models/User"),
       fs      = require("fs");
 
-function toTimestamp(strDate){
-    var localDateString = strDate;
-    var localDateStringFormat = 'MMMM DD, YYYY, h:mm  a';
-    var utcMoment = moment.utc(moment(localDateString, localDateStringFormat ).utc().format('YYYY-MM-DD HH:mm:ssZ'))
-    var x = utcMoment._d;
-    var utc_offset = moment_tz.tz.zone('America/New_York').utcOffset(x);    
-    var dateUTC = Math.floor(parseInt((x.getTime() + x.getTimezoneOffset()*60*1000)/1000));
-    var dateEST = dateUTC - utc_offset*60; 
-    return dateEST;   
-}
 function nowTime()
 {
     var newDate = new Date();
@@ -107,7 +97,7 @@ router.get("/", (req, res)=>{
     }
     else
     {
-        Marketplace.find({"Meta.expired" : {"$gt" : nowTime()}}).sort({'Meta.created':-1}).exec((err, bids)=>{
+        Marketplace.find({"Meta.times_left" : {"$gt" : 0}}).sort({'Meta.created':-1}).exec((err, bids)=>{
             if(err)
             {
                 throw new Error(err.message);
@@ -115,7 +105,6 @@ router.get("/", (req, res)=>{
             return res.render("Marketplace/index/buyer",{data : bids});
         });
     }
-    
 });
 
 router.get("/:id",(req, res)=>{
@@ -146,6 +135,7 @@ router.post("/:show/bid", middlewareObj.isUserRegistered, (req, res)=>{
                 user_id : req.user._id,
                 bidding_price : price,
                 profilePicture : req.user.profilePicture,
+                freshness_threhsold : parseFloat(req.body.freshness_threhsold),
                 name : req.user.name,
                 email : req.user.email
             };
@@ -241,14 +231,18 @@ router.post("/:show/edit", middlewareObj.isUserRegistered, upload.single('produc
                     var edited_data = 
                     {
                         produce : req.body.produce, // name of the item
-                        description : req.body.description, //description of the produce
                         quantity : req.body.quantity, //number of items of produce
-                        bidding_price : req.body.bidding_price, //current (default = minimum) bidding price per unit.
-                        image : result.secure_url,
+                        bidding_price : parseFloat(req.body.bidding_price), // original bidding price set by the owner.
+                        image : result.secure_url, //image of the produce
+                        times_left : foundBid.Meta.times_left,
+                        created : foundBid.Meta.created,
+                        from : req.body.from,
+                        to : req.body.to,
+                        weight : parseFloat(req.body.weight),
+                        image : foundBid.Meta.image,
                         created : foundBid.Meta.created,
                         live_image : foundBid.Meta.live_image,
-                        expired : toTimestamp(req.body.expired),
-                        ripeness_percentage : foundBid.Meta.ripeness_percentage,
+                        ripeness_percentage : foundBid.Meta.ripeness_percentage
                     }
                     Marketplace.findByIdAndUpdate(id, {Meta : edited_data}, (err, updatedAuction)=>{
                         if(err)
@@ -265,12 +259,18 @@ router.post("/:show/edit", middlewareObj.isUserRegistered, upload.single('produc
                 var edited_data = 
                 {
                     produce : req.body.produce, // name of the item
-                    description : req.body.description, //description of the produce
                     quantity : req.body.quantity, //number of items of produce
-                    bidding_price : req.body.bidding_price, //current (default = minimum) bidding price per unit.
+                    bidding_price : parseFloat(req.body.bidding_price), // original bidding price set by the owner.
+                    image : foundBid.Meta.image, //image of the produce
+                    times_left : foundBid.Meta.times_left,
+                    created : foundBid.Meta.created,
+                    from : req.body.from,
+                    to : req.body.to,
+                    weight : parseFloat(req.body.weight),
                     image : foundBid.Meta.image,
                     created : foundBid.Meta.created,
-                    expired : toTimestamp(req.body.expired)
+                    live_image : foundBid.Meta.live_image,
+                    ripeness_percentage : foundBid.Meta.ripeness_percentage
                 }
                 Marketplace.findByIdAndUpdate(id, {Meta : edited_data}, (err, updatedAuction)=>{
                     if(err)
@@ -337,12 +337,14 @@ router.post("/new", middlewareObj.isUserRegistered, upload.single("produce_pictu
                     Meta : 
                     {
                         produce : req.body.produce, // name of the item
-                        description : req.body.description, //description of the produce
                         quantity : req.body.quantity, //number of items of produce
-                        bidding_price : (req.body.bidding_price), // original bidding price set by the owner.
+                        bidding_price : parseFloat(req.body.bidding_price), // original bidding price set by the owner.
                         image : result.secure_url, //image of the produce
-                        expiry : toTimestamp(req.body.expired),
+                        times_left : 3,
                         created : nowTime(),
+                        from : req.body.from,
+                        to : req.body.to,
+                        weight : parseFloat(req.body.weight),
                         live_image : "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fimage.freepik.com%2Ffree-icon%2Fempty-set-mathematical-symbol_318-59301.jpg&f=1&nofb=1"
                     },
                     Bids : [],
