@@ -85,13 +85,21 @@ function checkFileType(file, cb){
 
 
 router.get("/", (req, res)=>{
-    Marketplace.find({"Meta.expired" : {"$gt" : nowTime()}}).sort({'Meta.created':-1}).exec((err, bids)=>{
-        if(err)
-        {
-            throw new Error(err.message);
-        }
-        return res.render("Marketplace/index",{data : bids});
-    });
+    if(req.user && req.user._type == 0)
+    {
+        //Farmer view.
+    }
+    else
+    {
+        Marketplace.find({"Meta.expired" : {"$gt" : nowTime()}}).sort({'Meta.created':-1}).exec((err, bids)=>{
+            if(err)
+            {
+                throw new Error(err.message);
+            }
+            return res.render("Marketplace/index/buyer",{data : bids});
+        });
+    }
+    
 });
 
 router.get("/:id",(req, res)=>{
