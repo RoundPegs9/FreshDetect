@@ -5,6 +5,7 @@ const request = require("request"),
     spawn = require("child_process").spawn,
     router = express(),
     mailingSystemFunction = require("../middleware/mailingSystemFunctions"),
+    Queue = require("../models/Queue"),
     link = "https://eastus2.api.cognitive.microsoft.com/customvision/v3.0/Prediction/b0edd4db-a0fc-4395-80ce-0a19d78a0e56/classify/iterations/Iteration2/url";
  
 
@@ -175,7 +176,7 @@ router.post("/updateweb/:productID", (req, res)=>{
             return res.send(error);
         }
         // see whose user_id falls below the threshold marging. type = array.
-        //
+        var elem = foundAuction.Bids;
     });
 });
 module.exports = router;
