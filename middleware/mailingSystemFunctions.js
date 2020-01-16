@@ -80,7 +80,7 @@ mailingObj.welcomeEmail = function(name, emailAddress)
     });
 };
 
-mailingObj.sendBidEmail = function(from_name, to_email, to_name, produce_name, produce_id, bidding_price)
+mailingObj.sendBidEmail = function(from_name, to_name, to_email, produce_name, produce_id, bidding_price)
 {
     
     nodemailer.createTestAccount(function(err, account){
