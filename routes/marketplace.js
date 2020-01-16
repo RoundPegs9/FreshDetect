@@ -61,7 +61,7 @@ function checkFileType(file, cb){
 
 
 router.get("/", (req, res)=>{
-    if(req.user && req.user._type == 0)
+    if(req.user && !req.user._type)
     {
         //Farmer view.
         console.log(req.user.username);
@@ -96,7 +96,7 @@ router.get("/", (req, res)=>{
 });
 
 router.post("/new", middlewareObj.isUserRegistered, upload.single("produce_picture"), (req, res)=>{
-    if(req.user._type == 0)
+    if(!req.user._type)
     {
         console.log("0");
 
@@ -196,6 +196,7 @@ router.post("/new", middlewareObj.isUserRegistered, upload.single("produce_pictu
     }
     else
     {
+        console.log("3");
         req.flash("warning", "Only Farmers can post new products.|You're not authenticated to place shipments since you're a buyer and not a farmer.");
         return res.redirect("/marketplace");
     }
@@ -225,18 +226,20 @@ router.post("/:show/bid", middlewareObj.isUserRegistered, (req, res)=>{
             req.flash("error", "Produce not found| Make sure you have the right Produce ID.");
             return res.redirect("/marketplace");
         }
+        var price = req.body.bidding_price;
         if(req.user._id != foundBid.Owner.user_id)
         {
-            const price = parseFloat(req.body.bidding_price);
+            var price = req.body.bidding_price;
             var bid_info = 
             {
                 user_id : req.user._id,
                 bidding_price : price,
                 profilePicture : req.user.profilePicture,
-                freshness_threhsold : parseFloat(req.body.freshness_threhsold),
+                freshness_threhsold : req.body.freshness_threhsold,
                 name : req.user.name,
-                email : req.user.email
+                email : req.user.username
             };
+            console.log(bid_info);
             foundBid.Bids.push(bid_info);
             foundBid.save();
             mailingSystem.sendBidEmail(req.user.name, foundBid.Owner.name, foundBid.Owner.email, foundBid.Meta.produce, foundBid._id, foundBid.Meta.bidding_price);
@@ -263,7 +266,7 @@ router.post("/:show/cancelbid", middlewareObj.isUserRegistered, (req, res)=>{
         {
             for(var i = 0; i < foundBid.Bids.length; i++)
             {
-                if(foundBid.Bids[i].user_id == req.user._id && req.user._type == 0)
+                if(foundBid.Bids[i].user_id == req.user._id && !req.user._type)
                 {
                     foundBid.Bids.splice(i, 1);
                 }

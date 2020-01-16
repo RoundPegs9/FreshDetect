@@ -181,7 +181,8 @@ router.get("/activate/email/freshdetect/qw", function(req, res){
                 }
                 else
                 {
-                    return res.render("partials/signupPage", {token:token});
+                    console.log("In here.");
+                    return res.render("./partials/signupPage", {token:token});
                 }
             });
         }
@@ -214,7 +215,7 @@ router.post("/activate/confirm/email/:token/getStarted", upload.single('profileP
         }
         else
         {
-        // User profile information
+            // User profile information
             var username = verify.email.trim(),
                 name = verify.name.trim(),
                 isValidated = true,
