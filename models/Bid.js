@@ -14,15 +14,15 @@ var BidSchema = new mongoose.Schema({
         weight : Number, //new
         created : Number,
         live_image : String, // image taken from Fresh Detect IoT sensors.
-        ripeness_percentage : {type : Number, default : 0.0}
+        ripeness_percentage : {type : String, default : "0.0"}
     },
     
     Bids : // list of people who bid for the product.
     [
         {
             user_id : String, // id of the person who bid
-            bidding_price : Number, // price the person bid with
-            freshness_threhsold : Number, // minimum freshness level. new
+            bidding_price : String, // price the person bid with
+            freshness_threhsold : String, // minimum freshness level. new
             profilePicture : String, 
             name : String, // name of the bidder
             email : String, // contact information
