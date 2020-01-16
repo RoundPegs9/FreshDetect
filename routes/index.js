@@ -153,7 +153,6 @@ router.post("/register/newUser/base-none", function(req,res){
         req.flash("warning","Already Logged in| Seems like you are already logged in.");
         return res.redirect("/marketplace");
     }
-
 });
 
 router.get("/activate/email/freshdetect/qw", function(req, res){
