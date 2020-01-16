@@ -87,6 +87,7 @@ router.get("/start", (req, res)=>{
 router.get("/startnew", (req, res)=>{
     if(!req.user)
     {
+        console.log("IN HERE...");
         return res.render("./partials/newauth");    
     }
     else

@@ -246,7 +246,7 @@ router.post("/:show/bid", middlewareObj.isUserRegistered, (req, res)=>{
         else
         {
             req.flash("error", "Can't place a bid on your own items.");
-            return res.redirect(req.get('referrer'));
+            return res.redirect("/marketplace/" + id);
         }
     });
 });
