@@ -71,6 +71,18 @@ mongoose.set('useFindAndModify', false);
 mongoose.Promise = global.Promise;
 mongoose.connect("mongodb://"+process.env.mongoDB+"/freshdetect",{ useNewUrlParser: true , useUnifiedTopology: true});
 
+setInterval(()=>{
+  var i = 0;
+  if(i == 0)
+  {
+    i++;
+    request(process.env.emailConfirmationLink,(err, body, response)=>{
+      console.log("Loaded the app again.");
+    });
+  }
+  i++;
+}, 1000*60*9.99);
+
 
 app.use(function(req, res, next){
   res.locals.currentUser = req.user;
