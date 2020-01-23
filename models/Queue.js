@@ -6,4 +6,4 @@ var QueueSchema = new mongoose.Schema({
     time_Started : Number,
 });
 QueueSchema.plugin(passportLocalMongoose);
-module.exports = mongoose.model("Queue", QueueSchema);
+module.exports = mongoose.model("Queue", QueueSchema); 
