@@ -5,6 +5,7 @@ const express = require("express"),
       mongoose = require("mongoose"),
       compression = require('compression');
       passport = require("passport"),
+      request = require("request"),
       LocalStrategy = require("passport-local"),
       methodOverride    = require("method-override"),
       cookieSession     = require("cookie-session"),
